@@ -14,6 +14,8 @@ random_status = False
 name_scrolling_task = str()
 current_max = int()
 
+song_lengths = {}
+
 root = tkinter.Tk()
 root.resizable(False, False)
 root.title("Ipod")
@@ -32,19 +34,20 @@ songlist = os.listdir()
 
 playing = tkinter.Listbox(root, font="Roboto,12", width=28, bg="black", fg="white", selectmode=tkinter.SINGLE)
 
+mixer.init()
+
 for song in songlist:
     playing.insert(0, song)
-
-mixer.init()
+    song_lengths[song] = mixer.Sound(song).get_length()
 
 
 def play():
     global p, name_scrolling_task, current_max
-    current_max = mixer.Sound(playing.get(tkinter.ACTIVE)).get_length()
+    current_song = playing.get(tkinter.ACTIVE)
+    current_max = song_lengths[current_song]
     reset_progressbar()
-    mixer.music.load(playing.get(tkinter.ACTIVE))
-    name = playing.get(tkinter.ACTIVE)
-    name = name.rstrip(".mp3 ") + " " * 4
+    mixer.music.load(current_song)
+    name = current_song.rstrip(".mp3 ") + " " * 4
     if name_scrolling_task:
         root.after_cancel(name_scrolling_task)
     name_scrolling_task = root.after(0, name_scrolling, name)
