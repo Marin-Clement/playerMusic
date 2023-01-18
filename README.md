@@ -4,9 +4,6 @@
 <ol><li>Pygame</li>
 <li>Folder with music in it(or use the sample given)</li></ol>
 
-
-<p>This app is a simple music player built using the Pygame library's mixer module, Tkinter for the GUI, and the os library for file management.</p>
-
 <h2>How to use</h2>
 
 <ol><li>Run the script</li>
