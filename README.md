@@ -19,9 +19,7 @@ Folder with music in it(or use the sample given)</p>
 
 <h2>Notes</h2>
 
-<ul><li>The app only supports mp3 files</li
-><li>The app's GUI is fixed at 256x370 and cannot be resized.</li>
-<li>The song name displayed in the app will be truncated if it exceeds 22 characters</li>
-<li>The app's progress bar is not very accurate and may not work as expected</li>
-<li>The volume slider is not very responsive and the volume may not change until you release the slider</li>
-<li>The app does not have a stop button, to stop the song you have to select another song.</li></ul>
+<ul><li>The app only supports mp3 files</li>
+<li>The app's GUI is fixed at 256x370 and cannot be resized.</li>
+
+
