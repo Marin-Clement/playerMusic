@@ -3,14 +3,22 @@ import tkinter
 from tkinter import ttk
 from tkinter.filedialog import askdirectory
 import os
+import random
 
 p = False
 current_pos = 0
 
+repeat_status = False
+random_status = False
+
+name_scrolling_task = str()
+current_max = int()
+
 root = tkinter.Tk()
 root.resizable(False, False)
-root.title("IPOD")
-root.geometry("256x425")
+root.title("Ipod")
+root.iconbitmap("myIcon.ico")
+root.geometry("266x420")
 
 var = tkinter.StringVar()
 var.set("Select the song to play")
@@ -31,17 +39,48 @@ mixer.init()
 
 
 def play():
-    global p
+    global p, name_scrolling_task, current_max
     current_max = mixer.Sound(playing.get(tkinter.ACTIVE)).get_length()
     reset_progressbar()
     mixer.music.load(playing.get(tkinter.ACTIVE))
     name = playing.get(tkinter.ACTIVE)
-    var.set(f"{name[:20]}..." if len(name) > 22 else name)
+    name = name.rstrip(".mp3 ") + " " * 4
+    if name_scrolling_task:
+        root.after_cancel(name_scrolling_task)
+    name_scrolling_task = root.after(0, name_scrolling, name)
     mixer.music.play()
     p = False
     pause_button.config(text="Pause")
     current_time_max_ui.set(str(convert(current_max)))
     progressbar.config(maximum=current_max)
+
+
+def on_song_end():
+    if repeat_status:
+        play()
+    elif random_status:
+        choose_random_song()
+    else:
+        next_song()
+
+
+def stop():
+    global p, name_scrolling_task
+    mixer.music.stop()
+    p = False
+    pause_button.config(text="Pause")
+    if name_scrolling_task:
+        root.after_cancel(name_scrolling_task)
+    var.set("Select the song to play")
+    current_time_max_ui.set("")
+    current_time_ui.set("")
+    reset_progressbar()
+
+
+def name_scrolling(name):
+    global name_scrolling_task
+    var.set(name[:20])
+    name_scrolling_task = root.after(250, name_scrolling, name[1:]+name[0])
 
 
 def pause():
@@ -90,15 +129,17 @@ def next_song():
     play()
 
 
-def update_progressbar():
+def update():
     if not p and mixer.music.get_busy():
-        global current_pos
+        global current_pos, current_max
         progressbar.config(value=current_pos)
         current_pos += 1
         current_time_ui.set(str(convert(current_pos)))
-        root.after(1000, update_progressbar)
+        root.after(1000, update)
+        if current_pos >= int(current_max) - 1:
+            on_song_end()
     else:
-        root.after(1000, update_progressbar)
+        root.after(1000, update)
 
 
 def on_progressbar_click(event):
@@ -119,6 +160,35 @@ def reset_progressbar():
     progressbar.config(value=current_pos)
 
 
+def repeat():
+    global repeat_status
+    if not repeat_status:
+        repeat_button.config(bg="green")
+        repeat_status = True
+    else:
+        repeat_button.config(bg="white")
+        repeat_status = False
+
+
+def random_button():
+    global random_status
+    if not random_status:
+        random_song_button.config(bg="green")
+        random_status = True
+    else:
+        random_song_button.config(bg="white")
+        random_status = False
+
+
+def choose_random_song():
+    random_song = random.choice(songlist)
+    playing.activate(songlist.index(random_song))
+    playing.selection_clear(0, len(songlist) - 1)
+    playing.activate(songlist.index(random_song))
+    playing.selection_set(songlist.index(random_song), last=songlist.index(random_song))
+    play()
+
+
 def convert(seconds):
     seconds = seconds % (24 * 3600)
     seconds %= 3600
@@ -128,44 +198,45 @@ def convert(seconds):
     return "%02d:%02d" % (minutes, seconds)
 
 
+playing.grid(columnspan=3, row=0, padx=5,pady=5)
+
 current_t = tkinter.Label(root, font="Roboto,12", textvariable=current_time_ui)
 current_t.grid(row=2, column=0)
 
 max_t = tkinter.Label(root, font="Roboto,12", textvariable=current_time_max_ui)
 max_t.grid(row=2, column=2)
 
-text = tkinter.Label(root, font="Roboto,12", textvariable=var)
+text = tkinter.Label(root, font="Roboto,12", textvariable=var, pady=10)
 text.grid(row=3, columnspan=3)
 
+play_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Play", command=play)
+play_button.grid(row=4, column=0)
 
-text = tkinter.Label(root, font="Roboto,12", textvariable=var)
-text.grid(row=3, columnspan=3)
+stop_button = tkinter.Button(root,width=7, height=1, font="Roboto,12", text="Stop", command=stop)
+stop_button.grid(row=4, column=2)
 
-playing.grid(columnspan=3, row=0)
-
-play_button = tkinter.Button(root, width=7, height=1, font="Roboto", text="Play", command=play)
-play_button.grid(row=4, column=1)
-
-pause_button = tkinter.Button(root, width=7, height=1, font="Roboto", text="Pause", command=pause, fg="black")
+pause_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Pause", command=pause, fg="black")
 pause_button.grid(row=5, column=1)
 
-sound_label = tkinter.Label(root, font="Roboto,12", text="Volume:")
-sound_label.grid(row=6, column=0)
-
-volume = tkinter.Scale(root, from_=0, to=100, orient="horizontal", command=change_volume)
+volume = tkinter.Scale(root, from_=0, to=100, orient="horizontal", font="Roboto,12", command=change_volume)
 volume.set(100)
 volume.grid(row=6, column=1)
 
-next_button = tkinter.Button(root, width=7, height=1, font="Roboto", text="Next", command=next_song)
+next_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Next", command=next_song)
 next_button.grid(row=5, column=2)
 
-previous_button = tkinter.Button(root, width=7, height=1, font="Roboto", text="Previous", command=previous_song)
+previous_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Previous", command=previous_song)
 previous_button.grid(row=5, column=0)
 
+repeat_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Repeat", command=repeat, bg="white")
+repeat_button.grid(row=6, column=2)
+
+random_song_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Random", command=random_button, bg="white")
+random_song_button.grid(row=6, column=0)
+
 progressbar = ttk.Progressbar(root, length=250)
-progressbar.grid(row=1, columnspan=3)
+progressbar.grid(row=1, columnspan=3, pady=10)
 progressbar.bind("<Button-1>", on_progressbar_click)
 
-
-update_progressbar()
+update()
 root.mainloop()
