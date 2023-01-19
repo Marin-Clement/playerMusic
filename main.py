@@ -219,29 +219,29 @@ max_t.grid(row=2, column=2)
 text = tkinter.Label(root, font="Roboto,12", textvariable=var, pady=10)
 text.grid(row=3, columnspan=3)
 
-play_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Play", command=play)
+play_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Play", command=play, relief="groove")
 play_button.grid(row=4, column=0)
 
-stop_button = tkinter.Button(root,width=7, height=1, font="Roboto,12", text="Stop", command=stop)
+stop_button = tkinter.Button(root,width=7, height=1, font="Roboto,12", text="Stop", command=stop, relief="groove")
 stop_button.grid(row=4, column=2)
 
-pause_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Pause", command=pause, fg="black")
+pause_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Pause", command=pause, fg="black", relief="groove")
 pause_button.grid(row=5, column=1)
 
 volume = tkinter.Scale(root, from_=0, to=100, orient="horizontal", font="Roboto,12", command=change_volume)
 volume.set(100)
 volume.grid(row=6, column=1)
 
-next_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Next", command=next_song)
+next_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Next", command=next_song, relief="groove")
 next_button.grid(row=5, column=2)
 
-previous_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Previous", command=previous_song)
+previous_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Previous", command=previous_song, relief="groove")
 previous_button.grid(row=5, column=0)
 
-repeat_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Repeat", command=repeat, bg="silver")
+repeat_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Repeat", command=repeat, bg="silver", relief="groove")
 repeat_button.grid(row=6, column=2)
 
-random_song_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Random", command=random_button, bg="silver")
+random_song_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Random", command=random_button, bg="silver", relief="groove")
 random_song_button.grid(row=6, column=0)
 
 progressbar = ttk.Progressbar(root, length=250)
