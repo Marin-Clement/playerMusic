@@ -41,10 +41,9 @@ mixer.init()
 
 
 for song in songlist:
-    playing.insert(0, song)
+    playing.insert(tkinter.END, song)
     if song.endswith(".mp3"):
         song_lengths[song] = eyed3.load(song).info.time_secs
-
 
 def play():
     global p, name_scrolling_task, current_max
