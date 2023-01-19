@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter.filedialog import askdirectory
 import os
 import random
+import threading
 
 p = False
 current_pos = 0
@@ -36,9 +37,19 @@ playing = tkinter.Listbox(root, font="Roboto,12", width=28, bg="black", fg="whit
 
 mixer.init()
 
+
 for song in songlist:
     playing.insert(0, song)
-    song_lengths[song] = mixer.Sound(song).get_length()
+
+
+def load_songs():
+    global song_lengths
+    for song in songlist:
+        song_lengths[song] = mixer.Sound(song).get_length()
+
+
+thread = threading.Thread(target=load_songs)
+thread.start()
 
 
 def play():
