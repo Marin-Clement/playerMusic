@@ -4,7 +4,9 @@ from tkinter import ttk
 from tkinter.filedialog import askdirectory
 import os
 import random
-import threading
+import eyed3
+
+eyed3.log.setLevel("ERROR")
 
 p = False
 current_pos = 0
@@ -19,8 +21,8 @@ song_lengths = {}
 
 root = tkinter.Tk()
 root.resizable(False, False)
-root.title("Ipod")
 root.iconbitmap("myIcon.ico")
+root.title("MyPOD")
 root.geometry("266x420")
 
 var = tkinter.StringVar()
@@ -40,20 +42,14 @@ mixer.init()
 
 for song in songlist:
     playing.insert(0, song)
-
-
-def load_songs():
-    global song_lengths
-    for song in songlist:
-        song_lengths[song] = mixer.Sound(song).get_length()
-
-
-thread = threading.Thread(target=load_songs)
-thread.start()
+    if song.endswith(".mp3"):
+        song_lengths[song] = eyed3.load(song).info.time_secs
 
 
 def play():
     global p, name_scrolling_task, current_max
+    current_time_max_ui.set("00:00")
+    current_time_ui.set("00:00")
     current_song = playing.get(tkinter.ACTIVE)
     current_max = song_lengths[current_song]
     reset_progressbar()
@@ -98,7 +94,7 @@ def name_scrolling(name):
 
 
 def pause():
-    global p
+    global p, current_pos
     if not p:
         mixer.music.pause()
         p = True
@@ -162,6 +158,7 @@ def on_progressbar_click(event):
     current_pos = new_pos
     mixer.music.rewind()
     mixer.music.set_pos(new_pos)
+    progressbar.config(value=new_pos)
     if p:
         mixer.music.unpause()
         p = False
@@ -180,7 +177,7 @@ def repeat():
         repeat_button.config(bg="green")
         repeat_status = True
     else:
-        repeat_button.config(bg="white")
+        repeat_button.config(bg="silver")
         repeat_status = False
 
 
@@ -190,7 +187,7 @@ def random_button():
         random_song_button.config(bg="green")
         random_status = True
     else:
-        random_song_button.config(bg="white")
+        random_song_button.config(bg="silver")
         random_status = False
 
 
@@ -242,10 +239,10 @@ next_button.grid(row=5, column=2)
 previous_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Previous", command=previous_song)
 previous_button.grid(row=5, column=0)
 
-repeat_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Repeat", command=repeat, bg="white")
+repeat_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Repeat", command=repeat, bg="silver")
 repeat_button.grid(row=6, column=2)
 
-random_song_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Random", command=random_button, bg="white")
+random_song_button = tkinter.Button(root, width=7, height=1, font="Roboto,12", text="Random", command=random_button, bg="silver")
 random_song_button.grid(row=6, column=0)
 
 progressbar = ttk.Progressbar(root, length=250)
